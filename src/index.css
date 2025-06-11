@@ -23,7 +23,7 @@
 
 @layer base {
   body {
-    @apply font-general w-[100dvw] overflow-x-hidden bg-blue-50;
+    @apply font-zentry w-[100dvw] overflow-x-hidden bg-blue-50;
   }
 
   @font-face {
