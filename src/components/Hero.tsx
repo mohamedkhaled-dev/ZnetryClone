@@ -11,9 +11,31 @@ const Hero = () => {
   const [hasClicked, setHasClicked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadedVideos, setLoadedVideos] = useState(0);
+  const [transformStyle, setTransformStyle] = useState("");
 
   const totalVideos = 4;
   const nextVideoRef = useRef<HTMLVideoElement>(null);
+  const maskRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!maskRef.current) return;
+
+    const { left, top, width, height } =
+      maskRef.current.getBoundingClientRect();
+
+    const relativeX = (e.clientX - left) / width;
+    const relativeY = (e.clientY - top) / height;
+    const tiltX = (relativeY - 0.5) * 15;
+    const tiltY = (relativeX - 0.5) * -15;
+
+    const newTransform = `perspective(400px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.95,0.95,0.95)`;
+
+    setTransformStyle(newTransform);
+  };
+  const handleMouseLeave = () => {
+    setTransformStyle("");
+    maskRef.current?.classList.remove("inset-ring-black", "inset-ring-2");
+  };
 
   const handleVideoLoad = () => {
     setLoadedVideos((prev) => prev + 1);
@@ -94,7 +116,13 @@ const Hero = () => {
         className="relative z-10 h-dvh w-screen overflow-hidden rounded-lg bg-blue-75"
       >
         <div>
-          <div className="mask-clip-path absolute-center absolute z-50 size-64 cursor-pointer overflow-hidden rounded-lg">
+          <div
+            ref={maskRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="mask-clip-path absolute-center absolute z-50 size-64 cursor-pointer overflow-hidden rounded-lg "
+            style={{ transform: transformStyle }}
+          >
             <div
               onClick={handleMiniVdClick}
               className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100"
